@@ -27,6 +27,5 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-client
-server/
+client/node_modules
 server/instance
