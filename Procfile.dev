@@ -1,0 +1,2 @@
+web: PORT=4000 npm start --prefix client
+api: gunicorn --chdir ./server app:app --worker-class eventlet -w 1 --bind 127.0.0.1:5555 --reload
