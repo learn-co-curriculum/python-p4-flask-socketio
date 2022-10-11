@@ -5,11 +5,6 @@ name = "pypi"
 
 [packages]
 flask = "*"
-flask-sqlalchemy = "*"
-flask-migrate = "*"
-flask-cors = "*"
-sqlalchemy-serializer = "*"
-faker = "*"
 honcho = "*"
 flask-socketio = "*"
 gunicorn = "==20.1.0"

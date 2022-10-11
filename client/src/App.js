@@ -1,76 +1,48 @@
-import "./App.css";
-import HttpCall from "./components/HttpCall";
-import WebSocketCall from "./components/WebSocketCall";
-import { io } from "socket.io-client";
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
 
-function App() {
-  const [socketInstance, setSocketInstance] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [buttonStatus, setButtonStatus] = useState(false);
+let endPoint = "127.0.0.1:5555";
+let socket = io.connect(`${endPoint}`);
 
-//   useEffect(() => {
-//     fetch("/movies")
-//       .then((r) => r.json())
-//       .then((movies) => console.log(movies));
-//   }, []);
+const App = () => {
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
 
-  const handleClick = () => {
-    if (buttonStatus === false) {
-      setButtonStatus(true);
+  useEffect(() => {
+    getMessages();
+  }, [messages.length]);
+
+  const getMessages = () => {
+    socket.on("message", message => {
+      setMessages([...messages, message]);
+    });
+  };
+
+  const onChange = e => {
+    setMessage(e.target.value);
+  };
+
+  const onClick = () => {
+    if (message !== "") {
+      socket.emit("message", message);
+      setMessage("");
     } else {
-      setButtonStatus(false);
+      alert("Don't forget to add a message!");
     }
   };
 
-  useEffect(() => {
-    if (buttonStatus === true) {
-      const socket = io("127.0.0.1:5555/", {
-        transports: ["websocket"],
-        cors: {
-          origin: "127.0.0.1:4000/",
-        },
-      });
-
-      setSocketInstance(socket);
-
-      socket.on("connect", (data) => {
-        console.log(data);
-      });
-
-      setLoading(false);
-
-      socket.on("disconnect", (data) => {
-        console.log(data);
-      });
-
-      return function cleanup() {
-        socket.disconnect();
-      };
-    }
-  }, [buttonStatus]);
-
   return (
-    <div className="App">
-      <h1>Click the button for a list of movies!</h1>
-      <div className="line">
-        <HttpCall />
+    <div>
+      <h1>Welcome to the chat!</h1>
+       <div>
+          {messages.map(message => (
+          <p style={{"paddingLeft": "10px"}} key={message}>{message}</p>
+        ))}
       </div>
-      {!buttonStatus ? (
-        <button onClick={handleClick}>Show Movies</button>
-      ) : (
-        <>
-          <button onClick={handleClick}>Hide Movies</button>
-          <div className="line">
-            {!loading && <WebSocketCall socket={socketInstance} />}
-          </div>
-          <h1>Check the console for a list of movies!</h1>
-
-        </>
-      )}
+      <input value={message} name="message" onChange={e => onChange(e)} />
+      <button onClick={onClick}>Send Message</button>
     </div>
   );
-
-}
+};
 
 export default App;
