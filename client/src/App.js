@@ -9,11 +9,11 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [buttonStatus, setButtonStatus] = useState(false);
 
-  useEffect(() => {
-    fetch("/movies")
-      .then((r) => r.json())
-      .then((movies) => console.log(movies));
-  }, []);
+//   useEffect(() => {
+//     fetch("/movies")
+//       .then((r) => r.json())
+//       .then((movies) => console.log(movies));
+//   }, []);
 
   const handleClick = () => {
     if (buttonStatus === false) {
@@ -28,7 +28,7 @@ function App() {
       const socket = io("127.0.0.1:5555/", {
         transports: ["websocket"],
         cors: {
-          origin: "127.0.0.1:3000/",
+          origin: "127.0.0.1:4000/",
         },
       });
 
@@ -62,13 +62,15 @@ function App() {
         <>
           <button onClick={handleClick}>Hide Movies</button>
           <div className="line">
-            <h1>Check the console for a list of movies!</h1>
             {!loading && <WebSocketCall socket={socketInstance} />}
           </div>
+          <h1>Check the console for a list of movies!</h1>
+
         </>
       )}
     </div>
   );
+
 }
 
 export default App;

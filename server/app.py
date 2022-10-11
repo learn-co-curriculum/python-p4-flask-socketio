@@ -18,20 +18,11 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-@app.route('/movies', methods=['GET'])
+@socketio.on("movies")
 def movies():
-    if request.method == 'GET':
-        movies = Movie.query.all()
+    movies = Movie.query.all()
 
-        return make_response(
-            jsonify([movie.to_dict() for movie in movies]),
-            200,
-        )
-    
-    return make_response(
-        jsonify({"text": "Method Not Allowed"}),
-        405,
-    )
+    emit(jsonify([movie.to_dict() for movie in movies]))
 
 @app.route("/http-call")
 def http_call():
@@ -40,14 +31,10 @@ def http_call():
 
 @socketio.on("connect")
 def connected():
+    movies = [movie.to_dict() for movie in Movie.query.all()]
     print(request.sid)
     print("client has connected")
     emit("connect",{"data":f"id: {request.sid} is connected"})
-
-@socketio.on('data')
-def handle_message(data):
-    print("data from the front end: ",str(data))
-    emit("data",{'data':data,'id':request.sid},broadcast=True)
 
 @socketio.on("disconnect")
 def disconnected():
